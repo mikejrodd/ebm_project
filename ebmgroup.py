@@ -62,7 +62,7 @@ def plot_visualizations(filtered_df):
     # st.pyplot(fig)
 
 # Display the app title
-st.title('Management Practices Dashboard')
+st.title('Why Hire Us')
 
 # Call the function to plot visualizations
 plot_visualizations(filtered_df)
