@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # Load the dataset
 @st.cache_resource
 def load_data():
-    return pd.read_csv('/Users/michaelrodden/ESMT/wms_manu.csv')
+    return pd.read_csv('wms_manu.csv')
 
 df = load_data()
 
