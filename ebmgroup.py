@@ -37,13 +37,13 @@ def plot_visualizations(filtered_df):
     # Plotting
     fig, axs = plt.subplots(2, 2, figsize=(15, 10))
     sns.barplot(x='management', y='country', data=top_countries_management, palette='coolwarm', ax=axs[0, 0])
-    axs[0, 0].set_title('Top 10 Countries by Overall Management Score')
+    axs[0, 0].set_title('Top Countries by Overall Management Score')
     sns.barplot(x='monitor', y='country', data=top_countries_monitor, palette='coolwarm', ax=axs[0, 1])
-    axs[0, 1].set_title('Top 10 Countries by Monitoring Management Score')
+    axs[0, 1].set_title('Top Countries by Monitoring Management Score')
     sns.barplot(x='target', y='country', data=top_countries_target, palette='coolwarm', ax=axs[1, 0])
-    axs[1, 0].set_title('Top 10 Countries by Targets Management Score')
+    axs[1, 0].set_title('Top Countries by Targets Management Score')
     sns.barplot(x='people', y='country', data=top_countries_people, palette='coolwarm', ax=axs[1, 1])
-    axs[1, 1].set_title('Top 10 Countries by People Management Score')
+    axs[1, 1].set_title('Top Countries by People Management Score')
     plt.tight_layout()
     st.pyplot(fig)
 
