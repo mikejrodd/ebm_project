@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import geopandas as gpd
+import numpy as np
 
 # Load the dataset
 @st.cache_resource
@@ -47,19 +49,46 @@ def plot_visualizations(filtered_df):
     plt.tight_layout()
     st.pyplot(fig)
 
+    # World Map Visualization
+    plot_world_map(filtered_df)
+
     # Germany vs India Box Plot
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.boxplot(x='country', y='management', data=filtered_df[filtered_df['country'].isin(['Germany', 'India'])], palette='coolwarm', ax=ax)
     ax.set_title('Overall Management Score Distribution: Germany vs. India')
     st.pyplot(fig)
 
-    # # Indian Firms Comparison
-    # comparison_df = filtered_df[(filtered_df['country'] == 'India') & ((filtered_df['mne_country'] == 'Germany') | (filtered_df['mne_f'] == 0))]
-    # comparison_df['Group'] = comparison_df.apply(lambda x: 'MNE Country = Germany' if x['mne_country'] == 'Germany' else 'MNE_f = 0', axis=1)
-    # fig, ax = plt.subplots(figsize=(10, 6))
-    # sns.boxplot(x='Group', y='management', data=comparison_df, palette='coolwarm', ax=ax)
-    # ax.set_title('Management Score Comparison: Indian Firms with MNE Country = Germany vs MNE_f = 0')
-    # st.pyplot(fig)
+#map
+def plot_world_map(filtered_df):
+    avg_scores = filtered_df.groupby('country')['management'].mean().reset_index()
+    avg_scores['country'] = avg_scores['country'].replace({'United States': 'United States of America'})
+    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+    world = world.merge(avg_scores, how="left", left_on="name", right_on="country")
+
+    def get_color(value):
+        if pd.isnull(value):
+            return '#d9d9d9' 
+        else:
+            intervals = np.linspace(2.5, 3.4, num=10)
+            colors = ['#ff0000', '#ff4d4d', '#ff8080', '#ffb3b3', '#ffe6e6', 
+                    '#f0fff0', '#90ee90', '#3cb371', '#2e8b57', '#006400']  # Adjusted to green and red gradient
+            for i in range(len(intervals) - 1):
+                if intervals[i] <= value < intervals[i + 1]:
+                    return colors[i]
+            return colors[-1] 
+
+    colors = ['#ff0000', '#ff4d4d', '#ff8080', '#ffb3b3', '#ffe6e6', 
+            '#f0fff0', '#90ee90', '#3cb371', '#2e8b57', '#006400'] 
+
+    world['color'] = world['management'].apply(get_color)
+    fig, ax = plt.subplots(1, 1, figsize=(15, 10))
+    world.boundary.plot(ax=ax, linewidth=1)
+    world.plot(color=world['color'], ax=ax)
+    legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=color, markersize=10) for color in colors]
+    legend_labels = ['2.5-2.6', '2.6-2.7', '2.7-2.8', '2.8-2.9', '2.9-3.0', '3.0-3.1', '3.1-3.2', '3.2-3.3', '3.3-3.4', '> 3.4']
+    plt.legend(legend_handles, legend_labels, loc='lower right', title='Management Score Range')
+    plt.title('World Overall Management Scores')
+    st.pyplot(fig)
 
 # Display the app title
 st.title('Why Hire Us')
